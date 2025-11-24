@@ -1,0 +1,54 @@
+name: mjthor_spoc_image
+
+image_shape: &image_shape [3, 224, 224]
+shape_meta: &shape_meta
+  # acceptable types: rgb, low_dim
+  obs:
+    wrist_camera_r:
+      shape: *image_shape
+      type: rgb
+      horizon: ${n_obs_steps}
+    head_camera:
+      shape: *image_shape
+      type: rgb
+      horizon: ${n_obs_steps}
+    last_actions:
+      shape: [12]  # base(3) + right_arm(7) + right_gripper(2)
+      type: low_dim
+      horizon: ${n_obs_steps}
+  action:
+    shape: [12]  # base(3) + right_arm(7) + right_gripper(2)
+    horizon: ${horizon}
+
+dataset:
+  _target_: maniflow.dataset.sample_h5_dataset.MjThorToSpocDataset
+  data_path: /weka/prior/datasets/robomolmo/testing_door_14NOV/DoorOpeningDataGenConfig
+  camera_names: 
+    - wrist_camera_r
+    - head_camera
+  action_move_group_names:
+    - base
+    - right_arm
+    - right_gripper
+  action_spec:
+    base: 3
+    head: 2
+    right_arm: 7
+    left_arm: 7
+    right_gripper: 2
+    left_gripper: 2
+  input_window_size: ${n_obs_steps}
+  action_chunk_size: ${horizon}
+  val_ratio: 0.02
+  seed: 42
+  split: train  # Will automatically look in train/ and val/ subdirectories
+
+# Optional: add env_runner if you want to evaluate in a real environment
+# env_runner:
+#   _target_: maniflow.env_runner.robot_runner.RobotRunner
+#   eval_episodes: 10
+#   max_steps: 300
+#   n_obs_steps: ${n_obs_steps}
+#   n_action_steps: ${n_action_steps}
+#   task_name: mjthor_spoc
+

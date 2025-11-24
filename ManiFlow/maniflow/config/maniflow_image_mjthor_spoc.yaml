@@ -1,0 +1,177 @@
+defaults:
+  - robotwin_task: mjthor_spoc_image
+  - _self_
+
+name: train_maniflow_mjthor_spoc
+
+task_name: ${robotwin_task.name}
+shape_meta: ${robotwin_task.shape_meta}
+exp_name: "mjthor_spoc_baseline"
+
+# Temporal parameters
+horizon: 8  # action_chunk_size - how many future actions to predict
+n_obs_steps: 4  # input_window_size - how many observation frames to use
+n_action_steps: 8  # how many action steps to execute in the environment
+n_latency_steps: 0
+dataset_obs_steps: ${n_obs_steps}
+keypoint_visible_rate: 1.0
+obs_as_global_cond: true
+
+policy:
+  _target_: maniflow.policy.maniflow_image_policy.ManiFlowTransformerImagePolicy
+  block_type: "DiTX"
+  n_layer: 12  # transformer depth
+  n_head: 8  # attention heads
+  n_emb: 768  # embedding dimension
+  visual_cond_len: 1024  # max visual token length
+  max_lang_cond_len: 1024  # maximum length of language tokens (for goal conditioning)
+  qkv_bias: true
+  qk_norm: true
+
+  language_conditioned: true  
+  pre_norm_modality: false
+
+  # Flow matching training ratios
+  flow_batch_ratio: 0.75 
+  consistency_batch_ratio: 0.25
+
+  # Sampling modes for training
+  sample_t_mode_flow: "beta"  # options: "beta" or "lognorm"
+  sample_t_mode_consistency: "discrete" 
+  sample_dt_mode_consistency: "uniform"
+  sample_target_t_mode: "relative"  # options: "relative" or "absolute"
+  denoise_timesteps: 10
+
+  diffusion_timestep_embed_dim: 128
+  diffusion_target_t_embed_dim: 128
+
+  horizon: ${horizon}
+  n_action_steps: ${n_action_steps}
+  n_obs_steps: ${n_obs_steps}
+
+  num_inference_steps: 10
+  obs_as_global_cond: true
+  shape_meta: ${shape_meta}
+
+  # Vision encoder configuration
+  obs_encoder:
+    _target_: maniflow.model.vision_2d.transformer_obs_encoder.TransformerObsEncoder
+    shape_meta: ${shape_meta}
+    global_pool: ''
+    n_emb: ${policy.n_emb}
+
+    # Use pretrained CLIP model for better image understanding
+    model_name: 'vit_base_patch16_clip_224.openai'
+    pretrained: True
+    frozen: True  
+
+    feature_aggregation: null
+
+    # Data augmentation during training
+    transforms:
+      - type: RandomCrop
+        ratio: 0.95
+      - _target_: torchvision.transforms.RandomRotation
+        degrees:
+          - -5.0
+          - 5.0
+        expand: false
+      - _target_: torchvision.transforms.ColorJitter
+        brightness: 0.3
+        contrast: 0.4
+        saturation: 0.5
+        hue: 0.08
+     
+    use_group_norm: True
+    share_rgb_model: False  # Set to True if you want to share weights across camera views
+
+# Exponential Moving Average model for stable inference
+ema:
+  _target_: maniflow.model.diffusion.ema_model.EMAModel
+  update_after_step: 0
+  inv_gamma: 1.0
+  power: 0.75
+  min_value: 0.0
+  max_value: 0.9999
+
+# Training dataloader configuration
+dataloader:
+  batch_size: 64  # Adjust based on your GPU memory
+  num_workers: 8
+  shuffle: True
+  pin_memory: True
+  persistent_workers: True
+
+# Validation dataloader configuration
+val_dataloader:
+  batch_size: 64
+  num_workers: 8
+  shuffle: False
+  pin_memory: True
+  persistent_workers: False
+
+# Optimizer configuration
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1.0e-4
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+  weight_decay: 1.0e-3
+
+# Training configuration
+training:
+  device: "cuda:0"
+  env_device: "cuda:0"
+  seed: 42
+  debug: False  # Set to True for quick debugging runs
+  resume: True  # Resume from checkpoint if available
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  num_epochs: 501
+  gradient_accumulate_every: 1
+  use_ema: True
+  rollout_every: 100  # Evaluate in environment every N epochs (if env_runner configured)
+  checkpoint_every: 100
+  val_every: 50  # Run validation every N epochs
+  sample_every: 5  # Log samples every N epochs
+  max_train_steps: null  # Set to a number to limit training steps per epoch
+  max_val_steps: null  # Set to a number to limit validation steps
+  tqdm_interval_sec: 1.0
+
+# Weights & Biases logging configuration
+logging:
+  group: ${exp_name}
+  id: null
+  mode: online  # Set to "offline" or "disabled" to disable wandb
+  name: ${training.seed}
+  project: ManiFlow_MjThorSpoc
+  resume: true
+  tags:
+  - ${logging.project}
+  - mjthor_spoc
+
+# Checkpoint management
+checkpoint:
+  save_ckpt: True  # Save checkpoints during training
+  topk:
+    monitor_key: val_loss  # options: "val_loss" or "test_mean_score"
+    mode: min  # "min" for val_loss, "max" for test_mean_score
+    k: 3  # Keep top-k checkpoints
+    format_str: 'epoch={epoch:04d}-val_loss={val_loss:.6f}.ckpt'
+  save_last_ckpt: True
+  save_last_snapshot: False
+
+# Hydra output directory configuration
+multi_run:
+  run_dir: data/outputs/${now:%Y.%m.%d}/${now:%H.%M.%S}_${name}_${task_name}
+  wandb_name_base: ${now:%Y.%m.%d-%H.%M.%S}_${name}_${task_name}
+
+hydra:
+  job:
+    override_dirname: ${name}
+  run:
+    dir: data/outputs/${now:%Y.%m.%d}/${now:%H.%M.%S}_${name}_${task_name}
+  sweep:
+    dir: data/outputs/${now:%Y.%m.%d}/${now:%H.%M.%S}_${name}_${task_name}
+    subdir: ${hydra.job.num}
+

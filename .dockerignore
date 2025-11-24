@@ -1,0 +1,58 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist
+build
+.eggs
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Cache directories
+.cache
+*.cache
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+
+# Build artifacts
+*.log
+*.tmp
+
+# Large data files (should be mounted at runtime)
+*.tar.gz
+*.zip
+*.h5
+*.pkl
+*.pth
+*.ckpt
+
+# Documentation that's not needed in the image
+*.md
+!README.md
+assets/
+
+# Keep test files
+!test_docker.sh
+!test_environment.py
+
