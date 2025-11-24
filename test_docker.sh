@@ -67,9 +67,9 @@ echo
 
 # Test 6: Test mounted code (requires source code)
 echo "✓ Test 6: Testing code mounting..."
-docker run --rm -v $(pwd):/root/ManiFlow_Policy $IMAGE_NAME -c "\
-cd /root/ManiFlow_Policy && \
-ls -la ManiFlow/ > /dev/null && \
+docker run --rm -v $(pwd):/root/maniflow $IMAGE_NAME -c "\
+cd /root/maniflow && \
+ls -la maniflow/ > /dev/null && \
 ls -la third_party/ > /dev/null && \
 echo '  ✓ Code mounted successfully' && \
 echo '  ✓ ManiFlow directory accessible' && \
@@ -81,10 +81,10 @@ echo
 
 # Test 7: Test ManiFlow import (with mounted code)
 echo "✓ Test 7: Testing ManiFlow import with mounted code..."
-docker run --rm -v $(pwd):/root/ManiFlow_Policy $IMAGE_NAME -c "\
+docker run --rm -v $(pwd):/root/maniflow $IMAGE_NAME -c "\
 /opt/miniconda3/envs/maniflow/bin/python -c '\
 import sys; \
-sys.path.insert(0, \"/root/ManiFlow_Policy/ManiFlow\"); \
+sys.path.insert(0, \"/root/maniflow\"); \
 try:
     import maniflow; \
     print(\"  ✓ ManiFlow imported successfully\")
@@ -145,6 +145,6 @@ echo "✓ All tests passed!"
 echo "=========================================="
 echo
 echo "Your Docker image is ready to use. Run it with:"
-echo "  docker run --gpus all -it --rm --shm-size=32g -v \$(pwd):/root/ManiFlow_Policy $IMAGE_NAME"
+echo "  docker run --gpus all -it --rm --shm-size=32g -v \$(pwd):/root/maniflow $IMAGE_NAME"
 echo
 

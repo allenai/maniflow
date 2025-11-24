@@ -38,10 +38,8 @@ import time
 import threading
 import sys
 sys.path.insert(0, '../')
-sys.path.append('ManiFlow/env_runner')
-sys.path.append('ManiFlow/maniflow/policy')
-sys.path.append('ManiFlow')
-sys.path.append('ManiFlow/maniflow')
+sys.path.append('maniflow/env_runner')
+sys.path.append('maniflow/policy')
 
 from hydra.core.hydra_config import HydraConfig
 from maniflow.policy.maniflow_pointcloud_policy import ManiFlowTransformerPointcloudPolicy

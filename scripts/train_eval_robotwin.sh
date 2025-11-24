@@ -43,10 +43,10 @@ fi
 # Setup paths and configuration
 base_path="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 task_zarr_name=${processed_task_name}
-zarr_path="${base_path}/ManiFlow/data/${task_zarr_name}.zarr"
+zarr_path="${base_path}/data/${task_zarr_name}.zarr"
 exp_name=${processed_task_name}-${alg_name}-${addition_info}
 # run_dir="/gscratch/scrubbed/geyan/projects/ManiFlow_Policy/ManiFlow/data/outputs/${exp_name}_seed${seed}"
-run_dir="${base_path}/ManiFlow/data/outputs/${exp_name}_seed${seed}"
+run_dir="${base_path}/data/outputs/${exp_name}_seed${seed}"
 config_name=${alg_name}
 
 
@@ -76,7 +76,7 @@ echo -e "\033[33mTrain: ${train}, Eval: ${eval}\033[0m"
 
 
 # Change to workspace directory
-cd ManiFlow/maniflow/workspace
+cd maniflow/workspace
 
 # Training phase
 if [ $train = True ]; then

@@ -4,7 +4,7 @@ Quick test script to verify MjThorToSpoc dataset integration.
 Run this before starting full training to catch issues early.
 
 Usage:
-    python ManiFlow/maniflow/config/test_mjthor_dataset.py
+    python maniflow/config/test_mjthor_dataset.py
 """
 
 import sys
@@ -392,7 +392,7 @@ def main():
     if all_passed:
         print("✓ ALL TESTS PASSED!")
         print("\nYou can now run training with:")
-        print("  python ManiFlow/maniflow/workspace/train_mjthor_spoc_workspace.py \\")
+        print("  python maniflow/workspace/train_mjthor_spoc_workspace.py \\")
         print("      --config-name=maniflow_image_mjthor_spoc")
     else:
         print("✗ SOME TESTS FAILED!")

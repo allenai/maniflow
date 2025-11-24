@@ -1,6 +1,6 @@
 FROM ghcr.io/allenai/cuda:12.8-dev-ubuntu22.04-torch2.7.1-v1.2.199 AS conda_env_builder
 
-ENV APP_HOME=/root/ManiFlow_Policy
+ENV APP_HOME=/root/maniflow
 WORKDIR $APP_HOME
 
 # Install Vulkan and other system dependencies
@@ -132,7 +132,7 @@ WORKDIR $APP_HOME
 
 # Note: Source code will be mounted at runtime at $APP_HOME
 # Set PYTHONPATH to include mounted code locations
-ENV PYTHONPATH=${APP_HOME}:${APP_HOME}/ManiFlow:${APP_HOME}/third_party:${PYTHONPATH:-}
+ENV PYTHONPATH=${APP_HOME}:${APP_HOME}/third_party:${PYTHONPATH:-}
 
 # Aggressive cleanup to reduce image size
 RUN /opt/miniconda3/bin/conda clean -ya && \
@@ -153,9 +153,9 @@ RUN /opt/miniconda3/bin/conda clean -ya && \
 # - Adroit RL experts: https://1drv.ms/u/s!Ag5QsBIFtRnTlFWqYWtS2wMMPKNX?e=dw8hsS
 #   Place in: ./third_party/VRL3/ckpts
 # - robotwin models: https://drive.google.com/file/d/1VOvXZMWQU8-Y1-T2Si5SQLxdH6Eh8nVm/view?usp=sharing
-#   Place in: ./ManiFlow/maniflow/env/robotwin
+#   Place in: ./maniflow/env/robotwin
 # - robotwin assets: https://drive.google.com/file/d/1VPyzWJYNxQUMf3KSObCyjhawIZMPZExM/view?usp=sharing
-#   Place in: ./ManiFlow/maniflow/env/robotwin
+#   Place in: ./maniflow/env/robotwin
 
 # The -l flag makes bash act as a login shell and load /etc/profile, etc.
 ENTRYPOINT ["bash", "-l"]

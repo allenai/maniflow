@@ -29,7 +29,7 @@ def main() -> None:
          --exclude test_debug_images/ \
          --exclude .venv/ \
          --exclude assets/ \
-         ../ManiFlow_Policy {dest_adr}/maniflow"
+         ../maniflow {dest_adr}/maniflow"
     print(command)
     os.system(command)
 

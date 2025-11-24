@@ -41,9 +41,9 @@ fi
 # Setup paths and configuration
 base_path="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 dataset_path=data/${processed_task_name}_expert.zarr # e.g., data/adroit_door_expert.zarr, data/dexart_faucet_expert.zarr, data/metaworld_basketball_expert.zarr
-zarr_path="${base_path}/ManiFlow/${dataset_path}"
+zarr_path="${base_path}/${dataset_path}"
 exp_name=${task_name}-${alg_name}-${addition_info}
-run_dir="${base_path}/ManiFlow/data/outputs/${exp_name}_seed${seed}"
+run_dir="${base_path}/data/outputs/${exp_name}_seed${seed}"
 config_name=${alg_name}
 
 
@@ -72,7 +72,7 @@ echo -e "\033[33mTrain: ${train}, Eval: ${eval}\033[0m"
 
 
 # Change to workspace directory
-cd ManiFlow/maniflow/workspace
+cd maniflow/workspace
 
 # Training phase
 if [ $train = True ]; then

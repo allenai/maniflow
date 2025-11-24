@@ -18,9 +18,9 @@ eval_env_processes=8  # Number of parallel processes for evaluation in total, ad
 
 # Setup paths and configuration
 base_path="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-dataset_path=${base_path}/ManiFlow/data
+dataset_path=${base_path}/data
 exp_name=${task_name}-${alg_name}-${addition_info}
-run_dir="${base_path}/ManiFlow/data/outputs/${exp_name}_seed${seed}"
+run_dir="${base_path}/data/outputs/${exp_name}_seed${seed}"
 config_name=${alg_name}
 
 
@@ -114,7 +114,7 @@ echo -e "\033[33mTrain: ${train}, Eval: ${eval}\033[0m"
 
 
 # Change to workspace directory
-cd ManiFlow/maniflow/workspace
+cd maniflow/workspace
 
 # Training phase
 if [ $train = True ]; then
